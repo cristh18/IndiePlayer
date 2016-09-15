@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">IndiePlayer</string>
+    <string name="copy.request_error">"There is an error in tracks request. "</string>
 </resources>

@@ -1,30 +1,35 @@
 package com.cristto.indieplayer.ui.activities;
 
 import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.cristto.indieplayer.R;
+import com.cristto.indieplayer.api.events.TrackFailedEvent;
 import com.cristto.indieplayer.api.events.TracksSuccesEvent;
 import com.cristto.indieplayer.api.managers.TracksManager;
 import com.cristto.indieplayer.api.models.Track;
 import com.cristto.indieplayer.databinding.ActivityMainBinding;
-import com.cristto.indieplayer.providers.BusProvider;
+import com.cristto.indieplayer.providers.RxBus;
 import com.cristto.indieplayer.ui.adapters.TracksAdapter;
-import com.squareup.otto.Subscribe;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding activityMainBinding;
-    private List<Track> tracks;
+    private final String TAG = MainActivity.class.getName();
     private TracksAdapter adapter;
     private RecyclerView recyclerViewTracks;
 
+    private RxBus rxBus = RxBus.getrxBusInstance();
+    private CompositeSubscription subscriptions;
 
 
     @Override
@@ -35,25 +40,47 @@ public class MainActivity extends AppCompatActivity {
         buildViews();
     }
 
-    private void init(){
-        tracks = new ArrayList<>();
-        adapter = new TracksAdapter(this, tracks);
+    @Override
+    public void onStart() {
+        super.onStart();
+        subscriptions = new CompositeSubscription();
+        subscriptions
+                .add(rxBus.toObserverable()
+                        .subscribe(event -> {
+                            if (event instanceof TracksSuccesEvent) {
+                                fillAdapter(((TracksSuccesEvent) event).getTracks());
+                            } else if (event instanceof TrackFailedEvent) {
+                                showRequestError((TrackFailedEvent) event);
+                            }
+                        }));
+    }
+
+    private void showRequestError(TrackFailedEvent event) {
+        Toast.makeText(this, getString(R.string.copy_request_error).concat(event.getThrowable().getMessage()), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        subscriptions.clear();
+    }
+
+    private void init() {
         initViews();
     }
 
-    private void initViews(){
+    private void initViews() {
         recyclerViewTracks = activityMainBinding.recyclerViewTracks;
     }
 
-    private void buildViews(){
+    private void buildViews() {
         recyclerViewTracks.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         recyclerViewTracks.setHasFixedSize(true);
         recyclerViewTracks.setVerticalScrollBarEnabled(true);
-        recyclerViewTracks.setAdapter(adapter);
         getTracks();
     }
 
-    private void getTracks(){
+    private void getTracks() {
         TracksManager tracksManager = new TracksManager();
         tracksManager.getTracks(this);
     }
@@ -61,21 +88,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
-        BusProvider.getInstance().register(this);
     }
 
     @Override
     public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        BusProvider.getInstance().unregister(this);
     }
 
-    @Subscribe
-    public void onTracksSuccess(TracksSuccesEvent successEvent) {
-        fillAdapter(successEvent.getTracks());
-    }
 
     private void fillAdapter(List<Track> tracks) {
-        adapter.setItems(tracks);
+        adapter = new TracksAdapter(this, tracks);
+        recyclerViewTracks.setAdapter(adapter);
     }
 }

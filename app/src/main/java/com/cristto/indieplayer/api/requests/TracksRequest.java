@@ -4,11 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.cristto.indieplayer.api.config.ServiceGenerator;
+import com.cristto.indieplayer.api.events.TrackFailedEvent;
 import com.cristto.indieplayer.api.events.TracksSuccesEvent;
 import com.cristto.indieplayer.api.managers.ITracksManager;
 import com.cristto.indieplayer.api.models.Track;
 import com.cristto.indieplayer.api.services.TracksService;
-import com.cristto.indieplayer.providers.BusProvider;
+import com.cristto.indieplayer.providers.RxBus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,6 +24,7 @@ public class TracksRequest implements ITracksManager {
 
     private static final String TAG = TracksRequest.class.getSimpleName();
     private Subscription subscription;
+    private RxBus rxBus = RxBus.getrxBusInstance();
 
     @Override
     public void getTracks(Context context) {
@@ -39,13 +41,17 @@ public class TracksRequest implements ITracksManager {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e(TAG, ">>> onError: ".concat(toString().toLowerCase()));
+                        if (rxBus.hasObservers()) {
+                            rxBus.send(new TrackFailedEvent(e));
+                        }
                     }
 
                     @Override
                     public void onNext(List<Track> tracks) {
                         Log.e(TAG, "onNext: ".concat(String.valueOf(tracks.size())));
-                        BusProvider.postOnMain(new TracksSuccesEvent(tracks));
+                        if (rxBus.hasObservers()) {
+                            rxBus.send(new TracksSuccesEvent(tracks));
+                        }
                     }
                 });
     }
