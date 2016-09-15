@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private UsersAdapter usersAdapter;
     private RecyclerView recyclerViewTracks;
     private LinearLayout containerUserInfo;
-    private RxBus rxBus = RxBus.getrxBusInstance();
+    private RxBus rxBus = RxBus.getRxBusInstance();
     private CompositeSubscription subscriptions;
     private ProgressDialog progressDialog;
 

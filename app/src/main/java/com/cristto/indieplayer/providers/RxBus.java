@@ -6,6 +6,16 @@ import rx.subjects.SerializedSubject;
 import rx.subjects.Subject;
 
 public class RxBus {
+
+    private static RxBus rxBusInstance = new RxBus();
+
+    public RxBus() {
+    }
+
+    public static RxBus getRxBusInstance() {
+        return rxBusInstance;
+    }
+
     private final Subject<Object, Object> bus = new SerializedSubject<>(PublishSubject.create());
 
     public void send(Object o) {
@@ -20,18 +30,5 @@ public class RxBus {
         return bus.hasObservers();
     }
 
-    /**
-     *
-     */
 
-    private final static String TAG = RxBus.class.getSimpleName();
-
-    private static RxBus rxBusInstance = new RxBus();
-
-    public RxBus() {
-    }
-
-    public static RxBus getrxBusInstance() {
-        return rxBusInstance;
-    }
 }

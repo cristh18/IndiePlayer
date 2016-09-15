@@ -25,7 +25,7 @@ import rx.schedulers.Schedulers;
 public class UserInfoByTrackRequest implements IUserByTrackManager {
 
     private final String TAG = UserInfoByTrackRequest.class.getName();
-    private RxBus rxBus = RxBus.getrxBusInstance();
+    private RxBus rxBus = RxBus.getRxBusInstance();
 
     public void getUserInfo(Context context) {
         TracksService tracksService = ServiceGenerator.createService(context, TracksService.class);

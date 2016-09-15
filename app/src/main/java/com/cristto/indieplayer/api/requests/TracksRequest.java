@@ -24,7 +24,7 @@ public class TracksRequest implements ITracksManager {
 
     private static final String TAG = TracksRequest.class.getSimpleName();
     private Subscription subscription;
-    private RxBus rxBus = RxBus.getrxBusInstance();
+    private RxBus rxBus = RxBus.getRxBusInstance();
 
     @Override
     public void getTracks(Context context) {

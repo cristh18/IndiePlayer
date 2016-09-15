@@ -19,7 +19,7 @@ public class UserRequest implements IUserManager {
 
     private static final String TAG = UserRequest.class.getSimpleName();
     private Subscription subscription;
-    private RxBus rxBus = RxBus.getrxBusInstance();
+    private RxBus rxBus = RxBus.getRxBusInstance();
 
     @Override
     public void getUser(Context context) {
