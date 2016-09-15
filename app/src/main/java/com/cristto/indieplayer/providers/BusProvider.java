@@ -1,0 +1,33 @@
+package com.cristto.indieplayer.providers;
+
+import android.os.Handler;
+import android.os.Looper;
+
+import com.squareup.otto.Bus;
+
+public class BusProvider {
+
+    private static final Bus BUS = new Bus();
+    private static final Handler mainThread = new Handler(Looper.getMainLooper());
+
+    private BusProvider() {
+    }
+
+    public static Bus getInstance() {
+        return BUS;
+    }
+
+    public static void postOnMain(final Object event) {
+        mainThread.post(new Runnable() {
+            @Override
+            public void run() {
+                post(event);
+            }
+        });
+    }
+
+    public static void post(final Object event) {
+        getInstance().post(event);
+    }
+
+}

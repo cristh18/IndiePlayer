@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="base_url">https://api.soundcloud.com/</string>
+    <string name="client_id">289d8f92b9bb8df920b1d48726e18dc9</string>
+
+    <string name="url_tracks_service">/tracks?client_id=</string>
+
+</resources>
