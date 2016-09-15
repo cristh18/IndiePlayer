@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void validateSubscriptions() {
         subscriptions
-                .add(rxBus.toObserverable()
+                .add(rxBus.toObservable()
                         .subscribe(event -> {
                             if (event instanceof TracksSuccessEvent) {
                                 fillTracksAdapter(((TracksSuccessEvent) event).getTracks());
