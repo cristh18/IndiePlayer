@@ -4,11 +4,11 @@ import com.cristto.indieplayer.api.models.Track;
 
 import java.util.List;
 
-public class TracksSuccesEvent {
+public class TracksSuccessEvent {
 
     private List<Track> tracks;
 
-    public TracksSuccesEvent(List<Track> tracks) {
+    public TracksSuccessEvent(List<Track> tracks) {
         this.tracks = tracks;
     }
 

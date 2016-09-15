@@ -16,11 +16,15 @@ public class Track {
     @SerializedName("artwork_url")
     private String artworkURL;
 
-    public Track(String title, int id, String streamURL, String artworkURL) {
+    @SerializedName("user_id")
+    private String userId;
+
+    public Track(String title, int id, String streamURL, String artworkURL, String userId) {
         this.title = title;
         this.id = id;
         this.streamURL = streamURL;
         this.artworkURL = artworkURL;
+        this.userId = userId;
     }
 
     public String getTitle() {
@@ -37,5 +41,9 @@ public class Track {
 
     public String getArtworkURL() {
         return artworkURL;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

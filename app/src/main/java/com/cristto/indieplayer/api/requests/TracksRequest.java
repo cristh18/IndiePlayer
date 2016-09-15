@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.cristto.indieplayer.api.config.ServiceGenerator;
 import com.cristto.indieplayer.api.events.TrackFailedEvent;
-import com.cristto.indieplayer.api.events.TracksSuccesEvent;
+import com.cristto.indieplayer.api.events.TracksSuccessEvent;
 import com.cristto.indieplayer.api.managers.ITracksManager;
 import com.cristto.indieplayer.api.models.Track;
 import com.cristto.indieplayer.api.services.TracksService;
@@ -50,7 +50,7 @@ public class TracksRequest implements ITracksManager {
                     public void onNext(List<Track> tracks) {
                         Log.e(TAG, "onNext: ".concat(String.valueOf(tracks.size())));
                         if (rxBus.hasObservers()) {
-                            rxBus.send(new TracksSuccesEvent(tracks));
+                            rxBus.send(new TracksSuccessEvent(tracks));
                         }
                     }
                 });

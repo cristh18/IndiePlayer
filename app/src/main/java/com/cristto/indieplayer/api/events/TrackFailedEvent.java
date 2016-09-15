@@ -1,14 +1,9 @@
 package com.cristto.indieplayer.api.events;
 
-public class TrackFailedEvent {
+public class TrackFailedEvent extends FailedEvent{
 
-    private Throwable throwable;
 
     public TrackFailedEvent(Throwable throwable) {
-        this.throwable = throwable;
-    }
-
-    public Throwable getThrowable() {
-        return throwable;
+        super(throwable);
     }
 }

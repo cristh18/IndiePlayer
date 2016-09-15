@@ -1,5 +1,6 @@
 package com.cristto.indieplayer.ui.activities;
 
+import android.app.ProgressDialog;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,12 +10,20 @@ import android.widget.Toast;
 
 import com.cristto.indieplayer.R;
 import com.cristto.indieplayer.api.events.TrackFailedEvent;
-import com.cristto.indieplayer.api.events.TracksSuccesEvent;
+import com.cristto.indieplayer.api.events.TracksSuccessEvent;
+import com.cristto.indieplayer.api.events.UserByTrackFailedEvent;
+import com.cristto.indieplayer.api.events.UserByTrackSuccessEvent;
+import com.cristto.indieplayer.api.events.UserFailedEvent;
+import com.cristto.indieplayer.api.events.UserSuccessEvent;
 import com.cristto.indieplayer.api.managers.TracksManager;
+import com.cristto.indieplayer.api.managers.UserByTrackManager;
+import com.cristto.indieplayer.api.managers.UserManager;
 import com.cristto.indieplayer.api.models.Track;
+import com.cristto.indieplayer.api.models.User;
 import com.cristto.indieplayer.databinding.ActivityMainBinding;
 import com.cristto.indieplayer.providers.RxBus;
 import com.cristto.indieplayer.ui.adapters.TracksAdapter;
+import com.cristto.indieplayer.ui.adapters.UsersAdapter;
 
 import java.util.List;
 
@@ -22,13 +31,14 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ActivityMainBinding activityMainBinding;
     private final String TAG = MainActivity.class.getName();
-    private TracksAdapter adapter;
+    private ActivityMainBinding activityMainBinding;
+    private TracksAdapter tracksAdapter;
+    private UsersAdapter usersAdapter;
     private RecyclerView recyclerViewTracks;
-
     private RxBus rxBus = RxBus.getrxBusInstance();
     private CompositeSubscription subscriptions;
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -43,13 +53,25 @@ public class MainActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
         subscriptions = new CompositeSubscription();
+        validateSubscriptions();
+    }
+
+    private void validateSubscriptions() {
         subscriptions
                 .add(rxBus.toObserverable()
                         .subscribe(event -> {
-                            if (event instanceof TracksSuccesEvent) {
-                                fillAdapter(((TracksSuccesEvent) event).getTracks());
+                            if (event instanceof TracksSuccessEvent) {
+                                fillTracksAdapter(((TracksSuccessEvent) event).getTracks());
                             } else if (event instanceof TrackFailedEvent) {
                                 showRequestError((TrackFailedEvent) event);
+                            } else if (event instanceof UserSuccessEvent) {
+                                showUserInfo(((UserSuccessEvent) event).getUser());
+                            } else if (event instanceof UserFailedEvent) {
+                                showRequestError((UserFailedEvent) event);
+                            } else if (event instanceof UserByTrackSuccessEvent) {
+                                fillUsersAdapter(((UserByTrackSuccessEvent) event).getUsers());
+                            } else if (event instanceof UserByTrackFailedEvent) {
+                                showRequestError((UserByTrackFailedEvent) event);
                             }
                         }));
     }
@@ -57,6 +79,15 @@ public class MainActivity extends AppCompatActivity {
     private void showRequestError(TrackFailedEvent event) {
         Toast.makeText(this, getString(R.string.copy_request_error).concat(event.getThrowable().getMessage()), Toast.LENGTH_LONG).show();
     }
+
+    private void showRequestError(UserFailedEvent event) {
+        Toast.makeText(this, getString(R.string.copy_request_error).concat(event.getThrowable().getMessage()), Toast.LENGTH_LONG).show();
+    }
+
+    private void showRequestError(UserByTrackFailedEvent event) {
+        Toast.makeText(this, getString(R.string.copy_request_error).concat(event.getThrowable().getMessage()), Toast.LENGTH_LONG).show();
+    }
+
 
     @Override
     public void onStop() {
@@ -70,18 +101,36 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         recyclerViewTracks = activityMainBinding.recyclerViewTracks;
+        progressDialog = new ProgressDialog(this);
     }
 
     private void buildViews() {
         recyclerViewTracks.setLayoutManager(new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false));
         recyclerViewTracks.setHasFixedSize(true);
         recyclerViewTracks.setVerticalScrollBarEnabled(true);
-        getTracks();
+        progressDialog.setIndeterminate(true);
+        progressDialog.setCancelable(false);
+//        getTracks();
+//        getUser();
+        fetchUserByTracks();
     }
 
     private void getTracks() {
+        showProgressDialog(getString(R.string.copy_loading));
         TracksManager tracksManager = new TracksManager();
         tracksManager.getTracks(this);
+    }
+
+    private void getUser() {
+        showProgressDialog(getString(R.string.copy_loading));
+        UserManager userManager = new UserManager();
+        userManager.getUser(this);
+    }
+
+    private void fetchUserByTracks() {
+        showProgressDialog(getString(R.string.copy_loading));
+        UserByTrackManager userByTrackManager = new UserByTrackManager();
+        userByTrackManager.getUserInfo(this);
     }
 
     @Override
@@ -95,8 +144,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void fillAdapter(List<Track> tracks) {
-        adapter = new TracksAdapter(this, tracks);
-        recyclerViewTracks.setAdapter(adapter);
+    private void fillTracksAdapter(List<Track> tracks) {
+        tracksAdapter = new TracksAdapter(this, tracks);
+        recyclerViewTracks.setAdapter(tracksAdapter);
+        progressDialog.dismiss();
+    }
+
+    private void fillUsersAdapter(List<User> users) {
+        usersAdapter = new UsersAdapter(this, users);
+        recyclerViewTracks.setAdapter(usersAdapter);
+        progressDialog.dismiss();
+    }
+
+    private void showUserInfo(User user) {
+        Toast.makeText(this, "Soundcloud User name: ".concat(user.getUsername()), Toast.LENGTH_LONG).show();
+    }
+
+    protected void showProgressDialog(String message) {
+        progressDialog.setMessage(message);
+        progressDialog.show();
     }
 }
