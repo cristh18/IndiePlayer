@@ -6,6 +6,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.cristto.indieplayer.R;
@@ -31,11 +36,11 @@ import rx.subscriptions.CompositeSubscription;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final String TAG = MainActivity.class.getName();
     private ActivityMainBinding activityMainBinding;
     private TracksAdapter tracksAdapter;
     private UsersAdapter usersAdapter;
     private RecyclerView recyclerViewTracks;
+    private LinearLayout containerUserInfo;
     private RxBus rxBus = RxBus.getrxBusInstance();
     private CompositeSubscription subscriptions;
     private ProgressDialog progressDialog;
@@ -47,6 +52,30 @@ public class MainActivity extends AppCompatActivity {
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         init();
         buildViews();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_user:
+                getUser();
+                return true;
+            case R.id.action_tracks:
+                getTracks();
+                return true;
+            case R.id.action_users:
+                fetchUserByTracks();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -101,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void initViews() {
         recyclerViewTracks = activityMainBinding.recyclerViewTracks;
+        containerUserInfo = activityMainBinding.containerUserInfo;
         progressDialog = new ProgressDialog(this);
     }
 
@@ -110,9 +140,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewTracks.setVerticalScrollBarEnabled(true);
         progressDialog.setIndeterminate(true);
         progressDialog.setCancelable(false);
-//        getTracks();
-//        getUser();
-        fetchUserByTracks();
+        getTracks();
     }
 
     private void getTracks() {
@@ -122,7 +150,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getUser() {
-        showProgressDialog(getString(R.string.copy_loading));
         UserManager userManager = new UserManager();
         userManager.getUser(this);
     }
@@ -145,19 +172,25 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void fillTracksAdapter(List<Track> tracks) {
+        containerUserInfo.setVisibility(View.GONE);
+        recyclerViewTracks.setVisibility(View.VISIBLE);
         tracksAdapter = new TracksAdapter(this, tracks);
         recyclerViewTracks.setAdapter(tracksAdapter);
         progressDialog.dismiss();
     }
 
     private void fillUsersAdapter(List<User> users) {
+        containerUserInfo.setVisibility(View.GONE);
+        recyclerViewTracks.setVisibility(View.VISIBLE);
         usersAdapter = new UsersAdapter(this, users);
         recyclerViewTracks.setAdapter(usersAdapter);
         progressDialog.dismiss();
     }
 
     private void showUserInfo(User user) {
-        Toast.makeText(this, "Soundcloud User name: ".concat(user.getUsername()), Toast.LENGTH_LONG).show();
+        recyclerViewTracks.setVisibility(View.GONE);
+        containerUserInfo.setVisibility(View.VISIBLE);
+        activityMainBinding.textViewUsername.setText(user.getUsername());
     }
 
     protected void showProgressDialog(String message) {

@@ -10,6 +10,36 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView_tracks"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/container_user_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/image_size"
+                android:gravity="center"
+                android:text="@string/copy.soundcloud_username"
+                android:textSize="@dimen/font_size"
+                tools:text="Username" />
+
+            <TextView
+                android:id="@+id/textView_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/image_size"
+                android:gravity="center"
+                android:text="@string/copy.username"
+                android:textSize="@dimen/font_size"
+                tools:text="Username" />
+
+        </LinearLayout>
+
     </RelativeLayout>
 </layout>

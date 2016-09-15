@@ -1,0 +1,12 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/action_user"
+        android:title="@string/copy.user"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_tracks"
+        android:title="@string/copy.menu_tracks_in_date"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_users"
+        android:title="@string/copy.menu_users_by_tracks"
+        app:showAsAction="never" />
+</menu>

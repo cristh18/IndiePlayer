@@ -3,4 +3,8 @@
     <string name="copy.request_error">"There is an error in tracks request. "</string>
     <string name="copy.loading">Loading</string>
     <string name="copy.username">"Username: "</string>
+    <string name="copy.menu_tracks_in_date">Tracks in date</string>
+    <string name="copy.menu_users_by_tracks">Users by Tracks</string>
+    <string name="copy.user">User</string>
+    <string name="copy.soundcloud_username">Soundcloud User name</string>
 </resources>

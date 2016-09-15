@@ -53,7 +53,7 @@ public class UserInfoByTrackRequest implements IUserByTrackManager {
 
                     @Override
                     public void onNext(List<User> users) {
-                        Log.e(TAG, "OK");
+                        Log.e(TAG, "onNext");
                         if (rxBus.hasObservers()) {
                             rxBus.send(new UserByTrackSuccessEvent(users));
                         }
